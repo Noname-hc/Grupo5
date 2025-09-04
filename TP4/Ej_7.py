@@ -2,7 +2,7 @@
 # Motor de inferencia - Encadenamiento hacia atrás
 # ----------------------------
 
-# Base de reglas: cada regla se representa como (premisas, conclusión)
+# Base de reglas: cada regla se representa como una tupla (premisas, conclusión)
 reglas = [
     (["b", "c"], "a"),   # R1
     (["d", "e"], "b"),   # R2
@@ -13,36 +13,53 @@ reglas = [
     (["a", "g"], "f"),   # R7
 ]
 
-# Hechos iniciales (se infieren de reglas sin premisas)
-hechos = set([conclusion for premisas, conclusion in reglas if len(premisas) == 0])
+# Iniciamos un contador de iteraciones para finalmente saber en cuantas se logra demostrar (o no) la hipotesis
+contador_iteraciones = 0
 
+# Hechos iniciales (se infieren de reglas sin premisas)
+# Básicamente si la lista de premisas de alguna de las reglas está vacía, entonces establece que esa conclusión es un hecho
+hechos = set([conclusion for premisas, conclusion in reglas if len(premisas) == 0])
 
 # ----------------------------
 # Encadenamiento hacia atrás
 # ----------------------------
-def probar_objetivo(objetivo, visitados=None):
+def probar_objetivo(objetivo, visitados=None, nivel=0):
+    global contador_iteraciones
+    contador_iteraciones += 1
+
     if visitados is None:
         visitados = set()
 
-    # Si ya lo tenemos como hecho, devolvemos True
+    indent = "  " * nivel  # sangría visual
+
+    print(f"{indent}Intentando demostrar: {objetivo}")
+
     if objetivo in hechos:
+        print(f"{indent}✔ '{objetivo}' es un hecho conocido.")
         return True
 
-    # Evitar bucles
     if objetivo in visitados:
+        print(f"{indent}✘ Ciclo detectado con '{objetivo}', se descarta.")
         return False
     visitados.add(objetivo)
 
-    # Buscar reglas cuya conclusión sea el objetivo
     for premisas, conclusion in reglas:
         if conclusion == objetivo:
-            # Verificar si todas las premisas se pueden demostrar
-            if all(probar_objetivo(p, visitados.copy()) for p in premisas):
-                hechos.add(objetivo)  # lo agregamos a los hechos conocidos
+            if premisas:
+                print(f"{indent}Usando regla: {' ∧ '.join(premisas)} → {conclusion}")
+            else:
+                print(f"{indent}Usando regla: {conclusion} (hecho base)")
+
+            # Intentar probar cada premisa recursivamente
+            if all(probar_objetivo(p, visitados.copy(), nivel + 1) for p in premisas):
+                hechos.add(objetivo)
+                print(f"{indent}✔ '{objetivo}' demostrado.")
                 return True
+            else:
+                print(f"{indent}✘ No se pudo demostrar '{objetivo}' con esta regla.")
 
+    print(f"{indent}✘ No hay manera de demostrar '{objetivo}'.")
     return False
-
 
 # ----------------------------
 # Menú interactivo
@@ -64,10 +81,14 @@ def menu():
                     print(f"R{i}: {conclusion} (hecho)")
         elif opcion == "2":
             h = input("Ingrese la hipótesis a demostrar: ").strip()
+            global contador_iteraciones
+            contador_iteraciones = 0  # reiniciamos antes de probar
             if probar_objetivo(h):
                 print(f"La hipótesis '{h}' SE PUEDE demostrar.")
             else:
                 print(f"La hipótesis '{h}' NO se puede demostrar.")
+            
+            print(f"Iteraciones realizadas: {contador_iteraciones}")        
         elif opcion == "3":
             print("Saliendo...")
             break
