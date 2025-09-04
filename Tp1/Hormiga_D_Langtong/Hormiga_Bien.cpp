@@ -56,11 +56,11 @@ int main() {
             endgame=true;
             return 0;
         }
-        if(x == COLUMNAS){
+        if(x == COLUMNAS+1){
             endgame=true;
             return 0;
         }
-        if(y == FILAS){
+        if(y == FILAS+1){
             endgame=true;
             return 0;
         }
