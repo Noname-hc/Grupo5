@@ -1,0 +1,24 @@
+(define (problem TP6_EJ6_prob)
+    (:domain TP6_EJ6_dom)
+    (:objects oficina cafeteria buzon ROBOT cafe carta caja)
+    (:init
+        (lugar oficina)
+        (lugar cafeteria)
+        (lugar buzon)
+        (robot ROBOT)
+        (objeto cafe)
+        (objeto carta)
+        (objeto caja)
+        (En-roblugar oficina)
+        (En-objlugar cafe cafeteria)
+        (En-objlugar carta buzon)
+        (En-objlugar caja oficina)  
+    )
+    (:goal
+        (and
+            (En-objlugar cafe oficina)
+            (En-objlugar carta oficina)            
+        )
+
+    )
+)

@@ -1,0 +1,38 @@
+(define (domain TP6_EJ6_dom)
+    (:requirements :strips)
+
+    (:predicates
+        (lugar ?l)
+        (robot ?r)
+        (objeto ?o)
+        (En-roblugar ?l)
+        (En-objlugar ?o ?l)
+        (Tiene-caja ?r)
+        (En-objcaja ?o)
+    )
+
+    (:action tomar-caja
+        :parameters (?caja ?oficina ?robot)
+        :precondition (and (objeto ?caja) (En-roblugar ?oficina) (En-objlugar ?caja ?oficina) (robot ?robot))
+        :effect (and (Tiene-caja ?robot) (not(En-objlugar ?caja ?oficina)))
+    )
+
+    (:action mover
+        :parameters (?desde ?hasta)
+        :precondition (and (lugar ?desde) (lugar ?hasta) (En-roblugar ?desde))
+        :effect (and (En-roblugar ?hasta) (not(En-roblugar ?desde)))
+    )
+
+    (:action poner-objeto-en-caja
+        :parameters (?obj ?lugar ?robot)
+        :precondition (and(En-objlugar ?obj ?lugar) (Tiene-caja ?robot) (En-roblugar ?lugar))
+        :effect (and (En-objcaja ?obj) (not(En-objlugar ?obj ?lugar)))
+    )
+
+    (:action sacar-objeto-de-caja
+        :parameters (?obj ?lugar ?robot)
+        :precondition (and (En-roblugar ?lugar) (En-objcaja ?obj) (Tiene-caja ?robot) (En-roblugar ?lugar))
+        :effect (and (En-objlugar ?obj ?lugar) (not(En-objcaja ?obj)))
+    )
+
+)
